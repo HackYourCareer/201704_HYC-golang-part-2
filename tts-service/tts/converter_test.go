@@ -17,7 +17,7 @@ func TestConverter(t *testing.T) {
 
 	Convey("VoiceRRS based converter", t, func(c C) {
 
-		Convey("should convert a text to a speech", func() {
+		SkipConvey("should convert a text to a speech", func() {
 
 			f, _ := os.Open("testdata" + string(os.PathSeparator) + "test")
 			defer f.Close()
@@ -41,7 +41,7 @@ func TestConverter(t *testing.T) {
 			So(rc, ShouldResemble, fc)
 		})
 
-		Convey("should return an error in case of an internal error", func() {
+		SkipConvey("should return an error in case of an internal error", func() {
 
 			converter := &voiceRssConverter{apiUrl: ""}
 
@@ -50,7 +50,7 @@ func TestConverter(t *testing.T) {
 			So(err, ShouldNotBeNil)
 		})
 
-		Convey("should return an error in case of an unexpected response code", func() {
+		SkipConvey("should return an error in case of an unexpected response code", func() {
 
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusBadRequest)
@@ -64,7 +64,7 @@ func TestConverter(t *testing.T) {
 			So(err, ShouldNotBeNil)
 		})
 
-		Convey("should return an error in case of an unexpected response content type", func() {
+		SkipConvey("should return an error in case of an unexpected response content type", func() {
 
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
