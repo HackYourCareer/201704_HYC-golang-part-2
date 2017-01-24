@@ -53,14 +53,13 @@
             });
         </script>
     </head>
-    <body>
+    <body background="images/background.jpg" style="background-size: cover">
         <h1>TTS - Try it out!</h1>
-        <hr/>
         <div>Request:</div>
         <br/>
         <div>
             <label for="ttsText">Text:</label>
-            <input type="text" id="ttsText" value="Hello, World" size="80" />
+            <input type="text" id="ttsText" value="Hello, World" size="80" style="size: 20px"/>
         </div>
         <div>
             <label for="ttsLang">Language:</label>
@@ -71,7 +70,6 @@
             <button id="submit">Send TTS Request!</button>
         </div>
         <br/><br/>
-        <hr/>
         <div>
             <div>Response:</div>
             <textarea id="jsonResponse" rows="10" cols="60" readonly>

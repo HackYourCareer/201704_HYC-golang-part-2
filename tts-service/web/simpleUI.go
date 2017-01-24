@@ -1,24 +1,44 @@
 package web
 
 import (
+	"io"
 	"net/http"
 	"os"
-	"io"
+	"strings"
 )
 
 func uiHandler(w http.ResponseWriter, r *http.Request) {
-	indexFilePath := os.Getenv("INDEX_FILE_PATH")
 
-	if len(indexFilePath) == 0 {
-		w.WriteHeader(404)
-		w.Write([]byte("Not Found (INDEX_FILE_PATH variable not set)."))
-	} else {
-		file, err := os.Open(indexFilePath)
-		if err != nil {
-			w.WriteHeader(500)
-			w.Write([]byte(err.Error()))
+	fileNameFromRequest := func() string {
+		filePath := strings.TrimPrefix(r.URL.Path, "/public/")
+
+		if filePath == "" {
+			filePath = "index.html"
 		}
-		defer file.Close()
-		io.Copy(w, file)
+		return filePath
 	}
+
+	publicDir := os.Getenv("PUBLIC_DIR")
+
+	if len(publicDir) == 0 {
+		w.WriteHeader(404)
+		w.Write([]byte("Not Found (PUBLIC_DIR variable not set)."))
+		return
+	}
+
+	//Remove trailing slash, if any
+	publicDir = strings.TrimSuffix(publicDir, "/")
+
+	fileName := fileNameFromRequest()
+	filePath := publicDir + string(os.PathSeparator) + fileName
+
+	file, err := os.Open(filePath)
+	if err != nil {
+		w.WriteHeader(404)
+		w.Write([]byte("No such file: " + fileName))
+		return
+	}
+	defer file.Close()
+
+	io.Copy(w, file)
 }

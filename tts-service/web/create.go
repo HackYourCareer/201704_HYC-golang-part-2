@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"go-university/tts-service/service"
+	"github.com/SAPHybrisGliwice/golang-part-2/tts-service/service"
 	"strings"
 )
 

@@ -1,15 +1,14 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
-	"go-university/tts-service/service"
-	"go-university/tts-service/web"
-	"go-university/tts-service/tts"
-	"strconv"
+	"github.com/SAPHybrisGliwice/golang-part-2/tts-service/service"
+	"github.com/SAPHybrisGliwice/golang-part-2/tts-service/tts"
+	"github.com/SAPHybrisGliwice/golang-part-2/tts-service/web"
 	"os"
+	"strconv"
 )
 
 func main() {
@@ -25,8 +24,8 @@ func main() {
 
 	web.New(http.DefaultServeMux, controller, engine, selfUrl(portStr))
 
-	fmt.Println("Listening on port: " + portStr)
-	log.Fatal(http.ListenAndServe(":" + portStr, nil))
+	log.Printf("Listening on port: %v", portStr)
+	log.Fatal(http.ListenAndServe(":"+portStr, nil))
 }
 
 func selfUrl(port string) string {

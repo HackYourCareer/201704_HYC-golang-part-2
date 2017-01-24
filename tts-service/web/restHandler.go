@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"go-university/tts-service/service"
-	"go-university/tts-service/tts"
+	"github.com/SAPHybrisGliwice/golang-part-2/tts-service/service"
+	"github.com/SAPHybrisGliwice/golang-part-2/tts-service/tts"
+	"log"
 	"strings"
 )
 
@@ -31,11 +32,11 @@ func New(mux *http.ServeMux, ttsService service.TtsService, engine *tts.Engine, 
 	mux.HandleFunc(meh.pathPrefix, meh.handle)
 
 	//Handle simple UI
-	mux.HandleFunc("/", uiHandler)
+	mux.HandleFunc("/public/", uiHandler)
+	log.Printf("Installed web handlers.")
 }
 
 type mediaUrlFunc func(string) string
-
 
 // CREATE HANDLING
 type createHandling struct {
@@ -43,6 +44,7 @@ type createHandling struct {
 	mediaUrl   mediaUrlFunc
 	pathPrefix string
 }
+
 func (h createHandling) handle(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
@@ -59,6 +61,7 @@ type getHandling struct {
 	mediaUrl   mediaUrlFunc
 	pathPrefix string
 }
+
 func (h getHandling) handle(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
@@ -71,18 +74,18 @@ func (h getHandling) handle(w http.ResponseWriter, r *http.Request) {
 
 // MEDIA HANDLING
 type mediaHandling struct {
-	engine *tts.Engine
+	engine     *tts.Engine
 	pathPrefix string
 }
-func(h mediaHandling) handle(w http.ResponseWriter, r *http.Request) {
+
+func (h mediaHandling) handle(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
-	onGetMediaRequest(h, w, r)
+		onGetMediaRequest(h, w, r)
 	default:
-	onMethodNotSupported([]string{"GET"}, w, r)
+		onMethodNotSupported([]string{"GET"}, w, r)
 	}
 }
-
 
 // HELPER FUNCTIONS
 func onMethodNotSupported(allowed []string, w http.ResponseWriter, r *http.Request) {

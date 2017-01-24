@@ -1,7 +1,7 @@
 package web
 
 import (
-	"go-university/tts-service/service"
+	"github.com/SAPHybrisGliwice/golang-part-2/tts-service/service"
 )
 
 type CreateDTO struct {

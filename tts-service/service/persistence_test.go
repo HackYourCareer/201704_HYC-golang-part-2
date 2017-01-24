@@ -13,10 +13,10 @@ func TestPersistence(t *testing.T) {
 			id := "test1"
 
 			err := persistence.create(id, ttsData{
-				Text: "test text 1",
+				Text:     "test text 1",
 				Language: EN.String(),
-				Status: StatusPending.String(),
-				MediaId: "",
+				Status:   StatusPending.String(),
+				MediaId:  "",
 			})
 			defer persistence.del(id)
 
@@ -41,7 +41,7 @@ func TestPersistence(t *testing.T) {
 
 			_, ok := err.(ObjectNotFoundError)
 			So(ok, ShouldBeTrue)
-			So(err.Error(), ShouldEqual, "TTS with ID: '" + id + "' doesn't exist")
+			So(err.Error(), ShouldEqual, "TTS with ID: '"+id+"' doesn't exist")
 		})
 
 		Convey("should return ObjectAlreadyExistsError for existing files", func() {
@@ -49,10 +49,10 @@ func TestPersistence(t *testing.T) {
 			id := "test3"
 
 			data := ttsData{
-				Text: "test text 3",
+				Text:     "test text 3",
 				Language: EN.String(),
-				Status: StatusPending.String(),
-				MediaId: "audio123",
+				Status:   StatusPending.String(),
+				MediaId:  "audio123",
 			}
 
 			err := persistence.create(id, data)
@@ -61,19 +61,18 @@ func TestPersistence(t *testing.T) {
 			So(err, ShouldBeNil)
 
 			err = persistence.create(id, ttsData{
-				Text: "test text 3",
+				Text:     "test text 3",
 				Language: EN.String(),
-				Status: StatusPending.String(),
-				MediaId: "audio123",
+				Status:   StatusPending.String(),
+				MediaId:  "audio123",
 			})
 
 			So(err, ShouldNotBeNil)
 
 			_, ok := err.(ObjectAlreadyExistsError)
 			So(ok, ShouldBeTrue)
-			So(err.Error(), ShouldEqual, "TTS with ID: '" + id + "' already exists")
+			So(err.Error(), ShouldEqual, "TTS with ID: '"+id+"' already exists")
 		})
-
 
 		Convey("should update existing file", func() {
 			persistence := NewPersistence()
@@ -81,10 +80,10 @@ func TestPersistence(t *testing.T) {
 
 			//Create
 			err := persistence.create(id, ttsData{
-				Text: "test text 4",
+				Text:     "test text 4",
 				Language: EN.String(),
-				Status: StatusPending.String(),
-				MediaId: "",
+				Status:   StatusPending.String(),
+				MediaId:  "",
 			})
 			defer persistence.del(id)
 

@@ -17,7 +17,7 @@ type TtsResult struct {
 	Text     string
 	Language LangEnum
 	Status   StatusEnum
-	MediaId string
+	MediaId  string
 }
 
 //////////////////////////////////////// ENUMS ////////////////////////////////////////

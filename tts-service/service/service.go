@@ -4,7 +4,7 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
-	"go-university/tts-service/tts"
+	"github.com/SAPHybrisGliwice/golang-part-2/tts-service/tts"
 	"strings"
 )
 
@@ -26,7 +26,6 @@ func New(persistence TtsPersistence, engine MediaEngine) TtsService {
 		ttsEngine:   engine,
 	}
 }
-
 
 //Implementation
 

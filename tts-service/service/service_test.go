@@ -2,8 +2,8 @@ package service
 
 import (
 	"errors"
+	"github.com/SAPHybrisGliwice/golang-part-2/tts-service/tts"
 	. "github.com/smartystreets/goconvey/convey"
-	"go-university/tts-service/tts"
 	"testing"
 )
 
@@ -207,8 +207,8 @@ type interactionMock struct {
 	id   string  //tts id
 	data ttsData //tts persistence data
 
-	mediaIdToGenerate string //if empty, return error from tts.Engine.Process
-	ttsTextThatFails  string //if invoked with this text, simulate persistence failure
+	mediaIdToGenerate    string //if empty, return error from tts.Engine.Process
+	ttsTextThatFails     string //if invoked with this text, simulate persistence failure
 	ttsTextThatConflicts string //if invoked with this text, return ObjectAlreadyExistsError
 
 	recordChan chan string
@@ -265,8 +265,8 @@ func (mp *interactionMock) Process(text string, meta tts.Metadata) (string, erro
 	mp.recordChan <- "tts.Engine.Process"
 
 	if mp.mediaIdToGenerate == "" {
-	//Simulate error
-	return "", errors.New("Network Unreachable")
+		//Simulate error
+		return "", errors.New("Network Unreachable")
 	}
 	return mp.mediaIdToGenerate, nil
 }

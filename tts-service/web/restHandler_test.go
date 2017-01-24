@@ -1,14 +1,14 @@
 package web
 
 import (
-	"go-university/tts-service/service"
+	"github.com/SAPHybrisGliwice/golang-part-2/tts-service/service"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	. "github.com/smartystreets/goconvey/convey"
 	"bytes"
 	"encoding/json"
+	. "github.com/smartystreets/goconvey/convey"
 	"strings"
 )
 
@@ -108,7 +108,6 @@ func TestRestController(t *testing.T) {
 				}
 				req.Header.Set("Content-Type", "application/json")
 
-
 				mux := http.NewServeMux()
 				New(mux, defaultMockService(), nil, selfUrl)
 
@@ -162,7 +161,6 @@ func TestRestController(t *testing.T) {
 					t.Fatal(err)
 				}
 				req.Header.Set("Content-Type", "application/json")
-
 
 				mux := http.NewServeMux()
 				New(mux, defaultMockService(), nil, selfUrl)
@@ -220,7 +218,6 @@ func TestRestController(t *testing.T) {
 				}
 				req.Header.Set("Content-Type", "application/json")
 
-
 				mux := http.NewServeMux()
 				New(mux, getMockService("123", service.StatusReady), nil, selfUrl)
 
@@ -235,7 +232,6 @@ func TestRestController(t *testing.T) {
 				const expected = `{"id":"abc123","text":"Received: abcdef","language":"EN","status":"READY","mediaUrl":"` + selfUrl + `/media/123"}` + "\n"
 				So(string(rr.Body.String()), ShouldEqual, expected)
 			})
-
 
 		})
 		Convey("when handling GET request on /tts/{ID}", func() {
@@ -301,8 +297,6 @@ func TestRestController(t *testing.T) {
 	})
 }
 
-
-
 // Mocks for service.TtsService
 func defaultMockService() service.TtsService {
 	return getMockService("", service.StatusPending)
@@ -312,7 +306,7 @@ func getMockService(mediaId string, status service.StatusEnum) service.TtsServic
 	return mockService{status, mediaId}
 }
 
-type mockService struct{
+type mockService struct {
 	status  service.StatusEnum
 	mediaId string
 }
@@ -323,7 +317,7 @@ func (s mockService) Create(create service.TtsCreate) (*service.TtsResult, error
 		Text:     "Received: " + create.Text,
 		Language: create.Language,
 		Status:   s.status,
-		MediaId: s.mediaId,
+		MediaId:  s.mediaId,
 	}
 	return &res, nil
 }
@@ -332,15 +326,13 @@ func (s mockService) Get(id string) (*service.TtsResult, error) {
 
 	if id == "cafe" {
 		res := service.TtsResult{
-			Id: id,
-			Text: "coffee'h good",
+			Id:       id,
+			Text:     "coffee'h good",
 			Language: service.EN,
-			Status: service.StatusPending,
+			Status:   service.StatusPending,
 		}
 		return &res, nil
 	} else {
 		return nil, service.NotFound(id)
 	}
 }
-
-

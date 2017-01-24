@@ -1,10 +1,10 @@
 package service
 
 import (
-	"os"
-	"strings"
 	"encoding/json"
 	"log"
+	"os"
+	"strings"
 )
 
 //The interface of TTS data persistence
@@ -28,10 +28,10 @@ type TtsPersistence interface {
 }
 
 type ttsData struct {
-	Text    string
+	Text     string
 	Language string
-	Status  string
-	MediaId string
+	Status   string
+	MediaId  string
 }
 
 //Initializes the persistence module
@@ -53,6 +53,7 @@ func NewPersistence() TtsPersistence {
 type ObjectNotFoundError struct {
 	Message string
 }
+
 //ObjectNotFoundError implements built-in  "error" interface
 func (err ObjectNotFoundError) Error() string {
 	return err.Message
@@ -62,6 +63,7 @@ func (err ObjectNotFoundError) Error() string {
 type ObjectAlreadyExistsError struct {
 	Message string
 }
+
 //ObjectAlreadyExistsError implements built-in  "error" interface
 func (err ObjectAlreadyExistsError) Error() string {
 	return err.Message
@@ -76,7 +78,6 @@ func AlreadyExists(id string) ObjectAlreadyExistsError {
 	return ObjectAlreadyExistsError{"TTS with ID: '" + id + "' already exists"}
 }
 
-
 // Implementation
 
 const separator = string(os.PathSeparator)
@@ -85,10 +86,10 @@ type fileBased struct {
 	directory string
 }
 
-func(fb fileBased) create(id string, data ttsData) error {
+func (fb fileBased) create(id string, data ttsData) error {
 	path := fb.pathWithId(id)
 
-	file, err := os.OpenFile(path, os.O_RDWR | os.O_CREATE | os.O_EXCL, 0666)
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0666)
 
 	if err == nil {
 		encoder := json.NewEncoder(file)
@@ -104,7 +105,7 @@ func(fb fileBased) create(id string, data ttsData) error {
 	return err
 }
 
-func(fb fileBased) get(id string) (*ttsData, error) {
+func (fb fileBased) get(id string) (*ttsData, error) {
 
 	path := fb.pathWithId(id)
 	file, err := os.Open(path)
@@ -125,7 +126,7 @@ func(fb fileBased) get(id string) (*ttsData, error) {
 
 }
 
-func(fb fileBased) update(id string, status string, mediaId string) error {
+func (fb fileBased) update(id string, status string, mediaId string) error {
 	//Read file
 	data, err := fb.get(id)
 
@@ -149,11 +150,11 @@ func(fb fileBased) update(id string, status string, mediaId string) error {
 	return err
 }
 
-func(fb fileBased) del(id string) error {
+func (fb fileBased) del(id string) error {
 	return os.Remove(fb.pathWithId(id))
 }
 
-func(fb fileBased) pathWithId(name string) string {
+func (fb fileBased) pathWithId(name string) string {
 	var res string
 	if strings.HasSuffix(fb.directory, separator) {
 		res = fb.directory + name
