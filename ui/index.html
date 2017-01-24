@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+        <script>
+            $.postJSON = function(url, data, callback) {
+                return jQuery.ajax({
+                    'type': 'POST',
+                    'url': url,
+                    'contentType': 'application/json',
+                    'data': JSON.stringify(data),
+                    'dataType': 'json',
+                    'success': callback
+                });
+            };
+        </script>
+
+        <script>
+            $(document).ready(function(){
+
+                $("#playAudio").click(function(){
+                        $("#audio")[0].play();
+                });
+
+                $("#submit").click(function(){
+                    var ttsText = $("#ttsText").val();
+                    var ttsLang = $("#ttsLang").val();
+
+                    var data = {
+                        "text": ttsText,
+                        "language": ttsLang
+                    };
+
+                    var successHandler = function(data, textStatus, jqXHR) {
+
+                        $("#jsonResponse").val(JSON.stringify(data, null, "  "));
+
+                        if(data.mediaUrl) {
+                            $("#mediaUrl").val(data.mediaUrl);
+                            $("#audio").attr("src", data.mediaUrl);
+                            $("#playAudio").removeAttr("disabled");
+                        } else {
+                            $("#mediaUrl").val("");
+                            $("#audio").attr("src", "");
+                            $("#playAudio").attr("disabled", true);
+                        }
+                    };
+
+                    $.postJSON("http://localhost:8080/tts", data, successHandler);
+                });
+
+            });
+        </script>
+    </head>
+    <body>
+        <h1>TTS - Try it out!</h1>
+        <hr/>
+        <div>Request:</div>
+        <br/>
+        <div>
+            <label for="ttsText">Text:</label>
+            <input type="text" id="ttsText" value="Hello, World" size="80" />
+        </div>
+        <div>
+            <label for="ttsLang">Language:</label>
+            <select id="ttsLang">
+                <option value="EN">EN</option>
+                <option value="PL">PL</option>
+            </select>
+            <button id="submit">Send TTS Request!</button>
+        </div>
+        <br/><br/>
+        <hr/>
+        <div>
+            <div>Response:</div>
+            <textarea id="jsonResponse" rows="10" cols="60" readonly>
+            </textarea>
+            <div>
+                <label for="mediaUrl">Media Url:</label>
+                <input type="text" id="mediaUrl" readonly="readonly" size="50"/>
+                <button id="playAudio" disabled="false">Play!</button>
+            </div>
+        </div>
+        <audio id="audio" src=""></audio>
+    </body>
+</html>
