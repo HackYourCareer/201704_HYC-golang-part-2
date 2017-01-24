@@ -46,13 +46,7 @@ type createHandling struct {
 }
 
 func (h createHandling) handle(w http.ResponseWriter, r *http.Request) {
-
-	switch r.Method {
-	case "POST":
-		onCreateRequest(h, w, r)
-	default:
-		onMethodNotSupported([]string{"POST"}, w, r)
-	}
+	onCreateRequest(h, w, r)
 }
 
 // GET HANDLING
