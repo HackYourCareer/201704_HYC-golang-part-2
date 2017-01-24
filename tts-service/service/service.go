@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/SAPHybrisGliwice/golang-part-2/tts-service/tts"
 	"strings"
+	"errors"
 )
 
 //Public API
@@ -35,6 +36,10 @@ type impl struct {
 }
 
 func (srv impl) Create(create TtsCreate) (*TtsResult, error) {
+
+	if create.Text == "" {
+		return nil, errors.New("Cannot create: Text is empty")
+	}
 
 	id := generateId(create.Text, create.Language.String())
 
