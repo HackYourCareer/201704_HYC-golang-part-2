@@ -68,7 +68,7 @@ func (c voiceRssConverter) Convert(text string, meta Metadata) (io.Reader, error
 
 func newVoiceRssConverter() *voiceRssConverter {
 
-	apiKey := os.Getenv("VOICE_RRS_API_KEY")
+	apiKey := os.Getenv("VOICE_RSS_API_KEY")
 
 	return &voiceRssConverter{
 		apiUrl: "https://api.voicerss.org/",

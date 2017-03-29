@@ -15,7 +15,7 @@ import (
 
 func TestConverter(t *testing.T) {
 
-	Convey("VoiceRRS based converter", t, func(c C) {
+	Convey("VoiceRSS based converter", t, func(c C) {
 
 		Convey("should convert a text to a speech", func() {
 

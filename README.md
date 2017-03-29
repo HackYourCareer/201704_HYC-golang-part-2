@@ -2,6 +2,14 @@
 
 ## Text to speech microservice
 
+### Prerequisites
+
+1. Install Go (https://golang.org/doc/install)
+2. Install Git (https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+3. Clone repository into your Go workspace directory
+
+`mkdir SAPHybrisGliwice && cd $_ && git clone https://github.com/SAPHybrisGliwice/golang-part-2.git`
+
 ### How to run
 
 1. Setup following environment variables
