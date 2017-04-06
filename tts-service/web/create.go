@@ -6,8 +6,6 @@ import (
 	"errors"
 )
 
-
-
 func onCreateRequest(h createHandling, w http.ResponseWriter, r *http.Request) {
 
 	//1 read create DTO
@@ -18,9 +16,9 @@ func onCreateRequest(h createHandling, w http.ResponseWriter, r *http.Request) {
 	}
 
 	//2 validate create DTO
-	ttsCreate, validateError := validateCreateDTO(createDTO)
-	if validateError != nil {
-		handleError(validateError, w,r)
+	ttsCreate, validateErr := validateCreateDTO(createDTO)
+	if validateErr != nil {
+		handleError(validateErr, w,r)
 		return
 	}
 
