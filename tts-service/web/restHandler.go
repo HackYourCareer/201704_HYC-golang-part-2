@@ -22,14 +22,14 @@ func New(mux *http.ServeMux, ttsService service.TtsService, engine *tts.Engine, 
 		return selfUrl + mediaPathPrefix + mediaId
 	}
 
-	crh := createHandling{createPathPrefix, ttsService, mediaUrl}
-	gdh := getHandling{getPathPrefix, ttsService, mediaUrl}
-	meh := mediaHandling{mediaPathPrefix, engine}
+	create := createHandling{createPathPrefix, ttsService, mediaUrl}
+	get := getHandling{getPathPrefix, ttsService, mediaUrl}
+	media := mediaHandling{mediaPathPrefix, engine}
 
 	//Second argument must be a http.HandlerFunc Function!
-	mux.HandleFunc(crh.pathPrefix, crh.handle)
-	mux.HandleFunc(gdh.pathPrefix, gdh.handle)
-	mux.HandleFunc(meh.pathPrefix, meh.handle)
+	mux.HandleFunc(create.pathPrefix, create.handle)
+	mux.HandleFunc(get.pathPrefix, get.handle)
+	mux.HandleFunc(media.pathPrefix, media.handle)
 
 	//Handle simple UI
 	mux.HandleFunc("/public/", uiHandler)
