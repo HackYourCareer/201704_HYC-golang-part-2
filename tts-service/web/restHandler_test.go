@@ -311,7 +311,7 @@ type mockService struct {
 	mediaId string
 }
 
-func (s mockService) Create(create service.TtsCreate) (*service.TtsResult, error) {
+func (s mockService) Create(create *service.TtsCreate) (*service.TtsResult, error) {
 	res := service.TtsResult{
 		Id:       "abc123",
 		Text:     "Received: " + create.Text,
