@@ -12,7 +12,7 @@ import (
 //Public API
 
 type TtsService interface {
-	Create(create TtsCreate) (*TtsResult, error)
+	Create(create *TtsCreate) (*TtsResult, error)
 	Get(ID string) (*TtsResult, error)
 }
 
@@ -35,7 +35,7 @@ type impl struct {
 	ttsEngine   MediaEngine
 }
 
-func (srv impl) Create(create TtsCreate) (*TtsResult, error) {
+func (srv impl) Create(create *TtsCreate) (*TtsResult, error) {
 
 	if create.Text == "" {
 		return nil, errors.New("Cannot create: Text is empty")
