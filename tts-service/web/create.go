@@ -23,7 +23,7 @@ func onCreateRequest(h createHandling, w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Invoke service
-	result, serviceErr := h.service.Create(*ttsCreate)
+	result, serviceErr := h.service.Create(ttsCreate)
 	if serviceErr != nil {
 		message := ErrorDTO{500, serviceErr.Error(), nil}
 		handleError(message, w, r)

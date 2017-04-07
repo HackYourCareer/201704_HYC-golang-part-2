@@ -22,14 +22,14 @@ func New(mux *http.ServeMux, ttsService service.TtsService, engine *tts.Engine, 
 		return selfUrl + mediaPathPrefix + mediaId
 	}
 
-	crh := createHandling{ttsService, mediaUrl, createPathPrefix}
-	gdh := getHandling{ttsService, mediaUrl, getPathPrefix}
-	meh := mediaHandling{engine, mediaPathPrefix}
+	create := createHandling{createPathPrefix, ttsService, mediaUrl}
+	get := getHandling{getPathPrefix, ttsService, mediaUrl}
+	media := mediaHandling{mediaPathPrefix, engine}
 
 	//Second argument must be a http.HandlerFunc Function!
-	mux.HandleFunc(crh.pathPrefix, crh.handle)
-	mux.HandleFunc(gdh.pathPrefix, gdh.handle)
-	mux.HandleFunc(meh.pathPrefix, meh.handle)
+	mux.HandleFunc(create.pathPrefix, create.handle)
+	mux.HandleFunc(get.pathPrefix, get.handle)
+	mux.HandleFunc(media.pathPrefix, media.handle)
 
 	//Handle simple UI
 	mux.HandleFunc("/public/", uiHandler)
@@ -40,9 +40,9 @@ type mediaUrlFunc func(string) string
 
 // CREATE HANDLING
 type createHandling struct {
+	pathPrefix string
 	service    service.TtsService
 	mediaUrl   mediaUrlFunc
-	pathPrefix string
 }
 
 func (h createHandling) handle(w http.ResponseWriter, r *http.Request) {
@@ -57,9 +57,9 @@ func (h createHandling) handle(w http.ResponseWriter, r *http.Request) {
 
 // GET HANDLING
 type getHandling struct {
+	pathPrefix string
 	service    service.TtsService
 	mediaUrl   mediaUrlFunc
-	pathPrefix string
 }
 
 func (h getHandling) handle(w http.ResponseWriter, r *http.Request) {
@@ -74,8 +74,8 @@ func (h getHandling) handle(w http.ResponseWriter, r *http.Request) {
 
 // MEDIA HANDLING
 type mediaHandling struct {
-	engine     *tts.Engine
 	pathPrefix string
+	engine     *tts.Engine
 }
 
 func (h mediaHandling) handle(w http.ResponseWriter, r *http.Request) {

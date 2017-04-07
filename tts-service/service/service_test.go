@@ -73,7 +73,7 @@ func TestService(t *testing.T) {
 			s := New(mock, mock)
 
 			//when
-			res, err := s.Create(TtsCreate{text, EN})
+			res, err := s.Create(&TtsCreate{text, EN})
 
 			//then after Create
 			So(err, ShouldBeNil)
@@ -110,7 +110,7 @@ func TestService(t *testing.T) {
 			s := New(mock, mock)
 
 			//when
-			res, err := s.Create(TtsCreate{text, EN})
+			res, err := s.Create(&TtsCreate{text, EN})
 
 			//then after Create
 			So(err, ShouldBeNil)
@@ -147,7 +147,7 @@ func TestService(t *testing.T) {
 			s := New(mock, mock)
 
 			//when
-			res, err := s.Create(TtsCreate{text, EN})
+			res, err := s.Create(&TtsCreate{text, EN})
 
 			//then after Create
 			So(err, ShouldNotBeNil)
@@ -173,7 +173,7 @@ func TestService(t *testing.T) {
 			s := New(mock, mock)
 
 			//when
-			res, err := s.Create(TtsCreate{text, EN})
+			res, err := s.Create(&TtsCreate{text, EN})
 
 			//then after Create
 			So(err, ShouldBeNil)
