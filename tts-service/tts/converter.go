@@ -10,19 +10,26 @@ import (
 	"strings"
 )
 
-type Converter interface {
+type converter interface {
 
-	//Convert converts the text to a media.
-	//It returns an io.Reader of an error, if any.
-	Convert(text string, metadata Metadata) (io.Reader, error)
+	// Convert converts the text to a media.
+	// It returns an io.ReadCloser of an error, if any.
+	Convert(text string, metadata Metadata) (io.ReadCloser, error)
 }
 
+// VoiceRss based implementation of the converter interface //
 type voiceRssConverter struct {
 	apiKey string
 	apiUrl string
 }
 
-func (c voiceRssConverter) Convert(text string, meta Metadata) (io.Reader, error) {
+//  VoiceRSS mandatory parameters http://www.voicerss.org/api/documentation.aspx
+//  key - The API key (mandatory)
+//  src - The textual content for converting to speech (length limited by 100KB) (mandatory)
+//  hl  - The textual content language. Allows values: see Languages (mandatory)
+//  f   - The speech audio formats. Allows values: see Audio Formats. Default value: 8khz_8bit_mono. (optional)
+//  r   - The speech rate (speed). Allows values: from -10 (slowest speed) up to 10 (fastest speed). Default value: 0 (normal speed). (optional)
+func (c voiceRssConverter) Convert(text string, meta Metadata) (io.ReadCloser, error) {
 
 	response, err := http.PostForm(c.apiUrl, url.Values{
 		"key": {c.apiKey},
@@ -33,7 +40,6 @@ func (c voiceRssConverter) Convert(text string, meta Metadata) (io.Reader, error
 	})
 
 	if err != nil {
-
 		return nil, err
 	}
 
@@ -42,17 +48,7 @@ func (c voiceRssConverter) Convert(text string, meta Metadata) (io.Reader, error
 	case http.StatusOK:
 
 		if strings.HasPrefix(response.Header.Get("Content-Type"), "audio") {
-
-			r, w := io.Pipe()
-
-			go func() {
-				defer response.Body.Close()
-				defer w.Close()
-
-				io.Copy(w, response.Body)
-			}()
-
-			return r, nil
+			return response.Body, nil
 		}
 
 		defer response.Body.Close()
@@ -68,25 +64,19 @@ func (c voiceRssConverter) Convert(text string, meta Metadata) (io.Reader, error
 
 func newVoiceRssConverter() *voiceRssConverter {
 
-	apiKey := os.Getenv("VOICE_RSS_API_KEY")
-
 	return &voiceRssConverter{
 		apiUrl: "https://api.voicerss.org/",
-		apiKey: apiKey,
+		apiKey: os.Getenv("VOICE_RSS_API_KEY"),
 	}
 }
 
 func (c voiceRssConverter) resolveLang(lang string) string {
 
-	switch lang {
+	if lang == "PL" {
+                return "pl-pl"
+        }
 
-	case "PL":
-
-		return "pl-pl"
-	default:
-
-		return "en-us"
-	}
+        return "en-us"
 }
 
 const audioFormat = "16khz_16bit_stereo"

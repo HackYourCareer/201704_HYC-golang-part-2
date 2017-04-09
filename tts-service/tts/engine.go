@@ -1,54 +1,44 @@
 package tts
 
-import (
-	"io"
-)
+import "io"
 
+// Engine aggregates converter and storage types.
+// It is supposed to be used in other packages.
 type Engine struct {
-	crt Converter
-	str Storage
+	crt converter
+	str storage
 }
 
-//Process converts a given data to an audio media.
+// Process converts a given data to an audio media.
 // It returns a media ID or an error, if any.
 func (e Engine) Process(text string, meta Metadata) (string, error) {
 
-	result, err := e.crt.Convert(text, meta)
-
+	r, err := e.crt.Convert(text, meta)
 	if err != nil {
-
 		return "", err
 	}
 
-	id, err := e.str.Save(result)
+        defer r.Close()
 
+	id, err := e.str.Save(r)
 	if err != nil {
-
 		return "", err
 	}
 
 	return id, nil
 }
 
-//GetResult returns the processing result based on its ID.
-//It returns an io.Reader of an error, if any.
-func (e Engine) GetResult(id string) (io.Reader, error) {
+// Result returns the processing result based on its ID.
+// It returns an io.ReadCloser of an error, if any.
+func (e Engine) Result(id string) (io.ReadCloser, error) {
 
 	return e.str.Get(id)
 }
 
-//https://golang.org/doc/effective_go.html#composite_literals
+// https://golang.org/doc/effective_go.html#composite_literals
 func NewEngine() *Engine {
 
-	c := newVoiceRssConverter()
-	s := newFileSystemStorage()
-
-	return newEngine(c, s)
-}
-
-func newEngine(c Converter, s Storage) *Engine {
-
-	return &Engine{crt: c, str: s}
+	return &Engine{crt: newVoiceRssConverter(), str: newFileSystemStorage()}
 }
 
 type Metadata struct {

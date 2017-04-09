@@ -14,7 +14,7 @@ func onGetMediaRequest(h mediaHandling, w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	reader, err := h.engine.GetResult(id)
+	reader, err := h.engine.Result(id)
 
 	if err != nil {
 		handleError(err, w, r)

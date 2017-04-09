@@ -6,6 +6,7 @@ import (
 	"io"
 	"strings"
 	"testing"
+        "io/ioutil"
 )
 
 func TestEngine(t *testing.T) {
@@ -16,7 +17,7 @@ func TestEngine(t *testing.T) {
 
 			Convey("should pass error from converter", func() {
 
-				engine := newEngine(mockConverter{true}, mockStorage{false})
+				engine := &Engine{mockConverter{true}, mockStorage{false}}
 
 				_, err := engine.Process("", Metadata{})
 
@@ -26,7 +27,7 @@ func TestEngine(t *testing.T) {
 
 			Convey("should pass error from storage", func() {
 
-				engine := newEngine(mockConverter{false}, mockStorage{true})
+				engine := &Engine{mockConverter{false}, mockStorage{true}}
 
 				_, err := engine.Process("", Metadata{})
 
@@ -36,7 +37,7 @@ func TestEngine(t *testing.T) {
 
 			Convey("should not blow if there are no errors", func() {
 
-				engine := newEngine(mockConverter{false}, mockStorage{false})
+				engine := &Engine{mockConverter{false}, mockStorage{false}}
 
 				_, err := engine.Process("", Metadata{})
 
@@ -48,7 +49,7 @@ func TestEngine(t *testing.T) {
 
 			Convey("should pass error from storage", func() {
 
-				engine := newEngine(mockConverter{false}, mockStorage{true})
+				engine := &Engine{mockConverter{false}, mockStorage{true}}
 
 				_, err := engine.Process("", Metadata{})
 
@@ -58,7 +59,7 @@ func TestEngine(t *testing.T) {
 
 			Convey("should not blow if there are no errors", func() {
 
-				engine := newEngine(mockConverter{false}, mockStorage{false})
+				engine := &Engine{mockConverter{false}, mockStorage{false}}
 
 				_, err := engine.Process("", Metadata{})
 
@@ -75,14 +76,14 @@ type mockConverter struct {
 	failing bool
 }
 
-func (mc mockConverter) Convert(text string, metadata Metadata) (io.Reader, error) {
+func (mc mockConverter) Convert(text string, metadata Metadata) (io.ReadCloser, error) {
 
 	if mc.failing {
 
 		return nil, errors.New(converterErrorMessage)
 	}
 
-	return strings.NewReader("test"), nil
+	return ioutil.NopCloser(strings.NewReader("test")), nil
 }
 
 type mockStorage struct {
@@ -99,14 +100,14 @@ func (ms mockStorage) Save(data io.Reader) (string, error) {
 	return "dummyID", nil
 }
 
-func (ms mockStorage) Get(id string) (io.Reader, error) {
+func (ms mockStorage) Get(id string) (io.ReadCloser, error) {
 
 	if ms.failing {
 
 		return nil, errors.New(storageErrorMessage)
 	}
 
-	return strings.NewReader("test"), nil
+	return ioutil.NopCloser(strings.NewReader("test")), nil
 }
 
 func (ms mockStorage) Delete(id string) error {
