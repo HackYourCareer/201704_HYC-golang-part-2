@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"strings"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -17,7 +16,7 @@ func TestConverter(t *testing.T) {
 
 	Convey("VoiceRRS based converter", t, func(c C) {
 
-		SkipConvey("should convert a text to a speech", func() {
+		Convey("should convert a text to a speech", func() {
 
 			f, _ := os.Open("testdata" + string(os.PathSeparator) + "test")
 			defer f.Close()
@@ -41,7 +40,7 @@ func TestConverter(t *testing.T) {
 			So(rc, ShouldResemble, fc)
 		})
 
-		SkipConvey("should return an error in case of an internal error", func() {
+		Convey("should return an error in case of an internal error", func() {
 
 			converter := &voiceRssConverter{apiUrl: ""}
 
@@ -50,25 +49,10 @@ func TestConverter(t *testing.T) {
 			So(err, ShouldNotBeNil)
 		})
 
-		SkipConvey("should return an error in case of an unexpected response code", func() {
+		Convey("should return an error in case of an unexpected response code", func() {
 
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusBadRequest)
-			}))
-			defer server.Close()
-
-			converter := &voiceRssConverter{apiUrl: server.URL}
-
-			_, err := converter.Convert("whatever", Metadata{})
-
-			So(err, ShouldNotBeNil)
-		})
-
-		SkipConvey("should return an error in case of an unexpected response content type", func() {
-
-			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-				io.Copy(w, strings.NewReader("whatever"))
 			}))
 			defer server.Close()
 

@@ -1,21 +1,21 @@
 package tts
 
 import (
-        "io"
-        "io/ioutil"
-        "bytes"
+	"bytes"
+	"io"
+	"io/ioutil"
 )
 
 type converter interface {
 
-        // Convert converts the text to a media.
-        // It returns an io.ReadCloser of an error, if any.
-        Convert(text string, metadata Metadata) (io.ReadCloser, error)
+	// Convert converts the text to a media.
+	// It returns an io.ReadCloser of an error, if any.
+	Convert(text string, metadata Metadata) (io.ReadCloser, error)
 }
 
-// VoiceRss based implementation of the converter interface //
+// VoiceRss based implementation of the converter interface
 type voiceRssConverter struct {
-        apiUrl string
+	apiUrl string
 }
 
 //  VoiceRSS http://www.voicerss.org/api/documentation.aspx
@@ -30,21 +30,21 @@ type voiceRssConverter struct {
 //  r   - The speech rate (speed). Allows values: from -10 (slowest speed) up to 10 (fastest speed). Default value: 0 (normal speed). (optional)
 func (c voiceRssConverter) Convert(text string, meta Metadata) (io.ReadCloser, error) {
 
-       return ioutil.NopCloser(new(bytes.Buffer)), nil
+	return ioutil.NopCloser(new(bytes.Buffer)), nil
 }
 
 func newVoiceRssConverter() *voiceRssConverter {
 
-        return &voiceRssConverter{
-                apiUrl: "https://api.voicerss.org/",
-        }
+	return &voiceRssConverter{
+		apiUrl: "https://api.voicerss.org/",
+	}
 }
 
 func (c voiceRssConverter) resolveLang(lang string) string {
 
-        if lang == "PL" {
-                return "pl-pl"
-        }
+	if lang == "PL" {
+		return "pl-pl"
+	}
 
-        return "en-us"
+	return "en-us"
 }
