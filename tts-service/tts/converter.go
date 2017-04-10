@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"io/ioutil"
+	"os"
 )
 
 type converter interface {
@@ -16,6 +17,7 @@ type converter interface {
 // VoiceRss based implementation of the converter interface
 type voiceRssConverter struct {
 	apiUrl string
+	apiKey string
 }
 
 //  VoiceRSS http://www.voicerss.org/api/documentation.aspx
@@ -26,8 +28,6 @@ type voiceRssConverter struct {
 //  key - The API key (mandatory)
 //  src - The textual content for converting to speech (length limited by 100KB) (mandatory)
 //  hl  - The textual content language. Allows values: see Languages (mandatory)
-//  f   - The speech audio formats. Allows values: see Audio Formats. Default value: 8khz_8bit_mono. (optional)
-//  r   - The speech rate (speed). Allows values: from -10 (slowest speed) up to 10 (fastest speed). Default value: 0 (normal speed). (optional)
 func (c voiceRssConverter) Convert(text string, meta Metadata) (io.ReadCloser, error) {
 
 	return ioutil.NopCloser(new(bytes.Buffer)), nil
@@ -37,6 +37,7 @@ func newVoiceRssConverter() *voiceRssConverter {
 
 	return &voiceRssConverter{
 		apiUrl: "https://api.voicerss.org/",
+		apiKey: os.Getenv("VOICE_RSS_API_KEY"),
 	}
 }
 

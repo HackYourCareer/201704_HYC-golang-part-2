@@ -11,64 +11,11 @@ import (
 
 func TestEngine(t *testing.T) {
 
-	Convey("TTS engine", t, func(c C) {
+	Convey("Process method", t, func(c C) {
 
-		Convey("Process method", func() {
+		Convey("should return an ID in case of a success", func() {
 
-			Convey("should not blow if there are no errors", func() {
-
-				engine := &Engine{mockConverter{false}, mockStorage{false}}
-
-				id, err := engine.Process("", Metadata{})
-
-				So(err, ShouldBeNil)
-				So(id, ShouldNotBeNil)
-			})
-
-			Convey("should pass error from converter", func() {
-
-				engine := &Engine{mockConverter{true}, mockStorage{false}}
-
-				id, err := engine.Process("", Metadata{})
-
-				So(id, ShouldBeNil)
-				So(err, ShouldNotBeNil)
-				So(err.Error(), ShouldEqual, converterErrorMessage)
-			})
-
-			Convey("should pass error from storage", func() {
-
-				engine := &Engine{mockConverter{false}, mockStorage{true}}
-
-				id, err := engine.Process("", Metadata{})
-
-				So(id, ShouldBeNil)
-				So(err, ShouldNotBeNil)
-				So(err.Error(), ShouldEqual, storageErrorMessage)
-			})
-		})
-
-		Convey("GetResult method", func() {
-
-			Convey("should pass error from storage", func() {
-
-				engine := &Engine{mockConverter{false}, mockStorage{true}}
-
-				_, err := engine.Process("", Metadata{})
-
-				So(err, ShouldNotBeNil)
-				So(err.Error(), ShouldEqual, storageErrorMessage)
-			})
-
-			Convey("should not blow if there are no errors", func() {
-
-				engine := &Engine{mockConverter{false}, mockStorage{false}}
-
-				r, err := engine.Process("", Metadata{})
-
-				So(r, ShouldNotBeNil)
-				So(err, ShouldBeNil)
-			})
+			//TODO
 		})
 	})
 }

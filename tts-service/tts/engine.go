@@ -1,6 +1,8 @@
 package tts
 
-import "io"
+import (
+	"io"
+)
 
 // Engine aggregates converter and storage types.
 // It is supposed to be used in other packages.
@@ -13,19 +15,7 @@ type Engine struct {
 // It returns a media ID or an error, if any.
 func (e Engine) Process(text string, meta Metadata) (string, error) {
 
-	r, err := e.crt.Convert(text, meta)
-	if err != nil {
-		return "", err
-	}
-
-	defer r.Close()
-
-	id, err := e.str.Save(r)
-	if err != nil {
-		return "", err
-	}
-
-	return id, nil
+	return "", nil
 }
 
 // Result returns the processing result based on its ID.
