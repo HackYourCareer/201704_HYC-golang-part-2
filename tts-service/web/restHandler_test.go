@@ -170,7 +170,7 @@ func TestRestController(t *testing.T) {
 			Convey("should correctly return json with MediaUrl and correct Content-Type", func() {
 
 				//Encode JSON
-				u := CreateDTO{Text: "abcdef", Language: "PL"}
+				u := CreateDTO{Text: "abcdef", Language: "EN"}
 				b := new(bytes.Buffer)
 				json.NewEncoder(b).Encode(u)
 
@@ -192,7 +192,7 @@ func TestRestController(t *testing.T) {
 				So(rr.Code, ShouldEqual, http.StatusAccepted)
 				So(rr.Header().Get("Content-Type"), ShouldEqual, "application/json")
 
-				const expected = `{"id":"abc123","text":"Received: abcdef","language":"PL","status":"READY","mediaUrl":"` + selfUrl + `/media/123"}` + "\n"
+				const expected = `{"id":"abc123","text":"Received: abcdef","language":"EN","status":"READY","mediaUrl":"` + selfUrl + `/media/123"}` + "\n"
 				So(string(rr.Body.String()), ShouldEqual, expected)
 			})
 
