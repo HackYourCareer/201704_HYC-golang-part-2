@@ -106,7 +106,6 @@ func (fb fileBased) create(id string, data ttsData) error {
 }
 
 func (fb fileBased) get(id string) (*ttsData, error) {
-
 	path := fb.pathWithId(id)
 	file, err := os.Open(path)
 

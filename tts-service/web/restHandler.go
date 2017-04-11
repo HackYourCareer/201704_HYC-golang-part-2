@@ -13,8 +13,8 @@ import (
 //We pass ServeMux explicitly to be able to unit-test in isolation.
 func New(mux *http.ServeMux, ttsService service.TtsService, engine *tts.Engine, selfUrl string) {
 
-	const createPathPrefix = "/tts"
-	const getPathPrefix = "/tts/"
+	const createPathPrefix = "/voiceMessages"
+	const getPathPrefix = "/voiceMessages/"
 	const mediaPathPrefix = "/media/"
 
 	//Allows to construct URL to media given it's ID
@@ -46,8 +46,8 @@ type createHandling struct {
 }
 
 func (h createHandling) handle(w http.ResponseWriter, r *http.Request) {
-
 	onCreateRequest(h, w, r)
+	//TODO WEB 1: Handle correct method
 }
 
 // GET HANDLING
@@ -58,7 +58,6 @@ type getHandling struct {
 }
 
 func (h getHandling) handle(w http.ResponseWriter, r *http.Request) {
-
 	switch r.Method {
 	case "GET":
 		onGetByIdRequest(h, w, r)

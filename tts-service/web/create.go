@@ -1,56 +1,82 @@
 package web
 
 import (
+	"encoding/json"
 	"net/http"
+
 	"github.com/SAPHybrisGliwice/golang-part-2/tts-service/service"
-	"errors"
+	"strings"
 )
 
 func onCreateRequest(h createHandling, w http.ResponseWriter, r *http.Request) {
 
-	//1 read create DTO
-	createDTO, parseErr := readCreateDTO(r)
-	if parseErr != nil {
-		handleError(parseErr, w, r)
+	createDTO, inputErr := readCreateDTO(r)
+	if inputErr != nil {
+		handleError(inputErr, w, r)
 		return
 	}
 
-	//2 validate create DTO
-	ttsCreate, validateErr := validateCreateDTO(createDTO)
-	if validateErr != nil {
-		handleError(validateErr, w,r)
+	ttsCreate, validationErr := validateCreateDTO(createDTO)
+	if validationErr != nil {
+		handleError(validationErr, w, r)
 		return
 	}
 
-	//3 Invoke service
-	_, serviceErr := h.service.Create(ttsCreate)
+	//Invoke service
+	result, serviceErr := h.service.Create(ttsCreate)
 	if serviceErr != nil {
-		handleError(serviceErr, w, r)
-		return
+		message := ErrorDTO{http.StatusInternalServerError, serviceErr.Error(), nil}
+		handleError(message, w, r)
+	} else {
+		addJsonHeader(w)
+		w.WriteHeader(http.StatusAccepted)
+		json.NewEncoder(w).Encode(toResultDTO(result, h.mediaUrl))
 	}
 
-	//4 send the result
 }
 
 func readCreateDTO(r *http.Request) (*CreateDTO, error) {
-	//1 validate content-type
-	//2 validate body is not null
-	//3 parse input as json
+	var createDTO CreateDTO
 
-	return nil, errors.New("not implemented")
+	contentType := r.Header.Get("Content-Type")
+
+	if !strings.HasPrefix(contentType, "application/json") {
+		return nil, ErrorDTO{http.StatusUnsupportedMediaType, errInvalidContentType, nil}
+	}
+
+	if r.Body == nil {
+		err := ErrorDTO{400, errEmptyBody, nil}
+		return nil, err
+	} else {
+		err := json.NewDecoder(r.Body).Decode(&createDTO)
+		if err == nil {
+			return &createDTO, nil
+		} else {
+			return nil, ErrorDTO{http.StatusBadRequest, errJsonParse + err.Error(), nil}
+		}
+	}
 }
 
 func validateCreateDTO(dto *CreateDTO) (*service.TtsCreate, error) {
-	//1 validate text is not empty
-	//2 validate language
+	var details []string
 
-	return nil, errors.New("not implemented")
+	if dto.Text == "" {
+		details = append(details, errEmptyText)
+	}
+
+	//TODO WEB 2: Convert language
+
+	if len(details) == 0 {
+		return &service.TtsCreate{dto.Text, service.PL}, nil
+	} else {
+		return nil, ErrorDTO{http.StatusBadRequest, errInvalidPayload, details}
+	}
 }
-
 
 const errInvalidContentType = "Invalid Content-Type. Only application/json is supported"
 const errEmptyBody = "Request body must not be empty"
 const errJsonParse = "Can't read json data: "
 const errEmptyText = "Text is empty"
-const errUnsupportedLang = "Unsupported Language: "
+
+//const errUnsupportedLang = "Unsupported Language: "
 const errInvalidPayload = "Invalid payload"

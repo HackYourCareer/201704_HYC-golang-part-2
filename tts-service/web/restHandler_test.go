@@ -16,25 +16,11 @@ func TestRestController(t *testing.T) {
 	Convey("Rest Controller", t, func(c C) {
 
 		const selfUrl = "http://localhost:3000"
+		const rootUrl = "/voiceMessages"
 
 		Convey("when handling GET request on /tts", func() {
 
-			Convey("should respond with 405 (Method Not Allowed) status code", func() {
-				req, err := http.NewRequest("GET", "/tts", nil)
-
-				if err != nil {
-					t.Fatal(err)
-				}
-
-				mux := http.NewServeMux()
-				New(mux, defaultMockService(), nil, selfUrl)
-
-				//Test the request
-				rr := httptest.NewRecorder()
-
-				mux.ServeHTTP(rr, req)
-
-				So(rr.Code, ShouldEqual, http.StatusMethodNotAllowed)
+			SkipConvey("should respond with 405 (Method Not Allowed) status code", func() {
 
 			})
 		})
@@ -42,7 +28,7 @@ func TestRestController(t *testing.T) {
 		Convey("when handling POST request on /tts", func() {
 
 			Convey("should validate request Content-Type", func() {
-				req, err := http.NewRequest("POST", "/tts", nil)
+				req, err := http.NewRequest("POST", rootUrl, nil)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -59,7 +45,7 @@ func TestRestController(t *testing.T) {
 			})
 
 			Convey("should validate missing body", func() {
-				req, err := http.NewRequest("POST", "/tts", nil)
+				req, err := http.NewRequest("POST", rootUrl, nil)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -77,7 +63,7 @@ func TestRestController(t *testing.T) {
 			})
 
 			Convey("should validate empty body", func() {
-				req, err := http.NewRequest("POST", "/tts", strings.NewReader(" "))
+				req, err := http.NewRequest("POST", rootUrl, strings.NewReader(" "))
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -94,58 +80,8 @@ func TestRestController(t *testing.T) {
 				So(rr.Code, ShouldEqual, http.StatusBadRequest)
 			})
 
-			Convey("should correctly handle proper json body", func() {
+			SkipConvey("should validate language", func() {
 
-				//Encode JSON
-				u := CreateDTO{Text: "abcdef", Language: "EN"}
-				b := new(bytes.Buffer)
-				json.NewEncoder(b).Encode(u)
-
-				//Prepare request
-				req, err := http.NewRequest("POST", "/tts", b)
-				if err != nil {
-					t.Fatal(err)
-				}
-				req.Header.Set("Content-Type", "application/json")
-
-				mux := http.NewServeMux()
-				New(mux, defaultMockService(), nil, selfUrl)
-
-				//Test the request
-				rr := httptest.NewRecorder()
-
-				mux.ServeHTTP(rr, req)
-
-				So(rr.Code, ShouldEqual, http.StatusCreated)
-				const expected = `{"id":"abc123","text":"Received: abcdef","language":"EN","status":"PENDING"}` + "\n"
-				So(string(rr.Body.String()), ShouldEqual, expected)
-			})
-
-			Convey("should validate language", func() {
-
-				//Encode JSON
-				u := CreateDTO{Text: "abcdef", Language: "DE"}
-				b := new(bytes.Buffer)
-				json.NewEncoder(b).Encode(u)
-
-				//Prepare request
-				req, err := http.NewRequest("POST", "/tts", b)
-				if err != nil {
-					t.Fatal(err)
-				}
-				req.Header.Set("Content-Type", "application/json")
-
-				mux := http.NewServeMux()
-				New(mux, defaultMockService(), nil, selfUrl)
-
-				//Test the request
-				rr := httptest.NewRecorder()
-
-				mux.ServeHTTP(rr, req)
-
-				So(rr.Code, ShouldEqual, http.StatusBadRequest)
-				const expected = `{"status":400,"message":"Invalid payload","details":["Unsupported Language: DE"]}` + "\n"
-				So(string(rr.Body.String()), ShouldEqual, expected)
 			})
 
 			Convey("should require Text", func() {
@@ -156,7 +92,7 @@ func TestRestController(t *testing.T) {
 				json.NewEncoder(b).Encode(u)
 
 				//Prepare request
-				req, err := http.NewRequest("POST", "/tts", b)
+				req, err := http.NewRequest("POST", rootUrl, b)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -183,7 +119,7 @@ func TestRestController(t *testing.T) {
 				json.NewEncoder(b).Encode(u)
 
 				//Prepare request
-				req, err := http.NewRequest("POST", "/tts", b)
+				req, err := http.NewRequest("POST", rootUrl, b)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -204,7 +140,7 @@ func TestRestController(t *testing.T) {
 				So(string(rr.Body.String()), ShouldEqual, expected)
 			})
 
-			Convey("should correctly return json with MediaUrl and correct Content-Type", func() {
+			Convey("should correctly handle proper json body", func() {
 
 				//Encode JSON
 				u := CreateDTO{Text: "abcdef", Language: "EN"}
@@ -212,7 +148,34 @@ func TestRestController(t *testing.T) {
 				json.NewEncoder(b).Encode(u)
 
 				//Prepare request
-				req, err := http.NewRequest("POST", "/tts", b)
+				req, err := http.NewRequest("POST", rootUrl, b)
+				if err != nil {
+					t.Fatal(err)
+				}
+				req.Header.Set("Content-Type", "application/json")
+
+				mux := http.NewServeMux()
+				New(mux, defaultMockService(), nil, selfUrl)
+
+				//Test the request
+				rr := httptest.NewRecorder()
+
+				mux.ServeHTTP(rr, req)
+
+				So(rr.Code, ShouldEqual, http.StatusAccepted)
+				const expected = `{"id":"abc123","text":"Received: abcdef","language":"EN","status":"PENDING"}` + "\n"
+				So(string(rr.Body.String()), ShouldEqual, expected)
+			})
+
+			Convey("should correctly return json with MediaUrl and correct Content-Type", func() {
+
+				//Encode JSON
+				u := CreateDTO{Text: "abcdef", Language: "PL"}
+				b := new(bytes.Buffer)
+				json.NewEncoder(b).Encode(u)
+
+				//Prepare request
+				req, err := http.NewRequest("POST", rootUrl, b)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -226,18 +189,19 @@ func TestRestController(t *testing.T) {
 
 				mux.ServeHTTP(rr, req)
 
-				So(rr.Code, ShouldEqual, http.StatusCreated)
+				So(rr.Code, ShouldEqual, http.StatusAccepted)
 				So(rr.Header().Get("Content-Type"), ShouldEqual, "application/json")
 
-				const expected = `{"id":"abc123","text":"Received: abcdef","language":"EN","status":"READY","mediaUrl":"` + selfUrl + `/media/123"}` + "\n"
+				const expected = `{"id":"abc123","text":"Received: abcdef","language":"PL","status":"READY","mediaUrl":"` + selfUrl + `/media/123"}` + "\n"
 				So(string(rr.Body.String()), ShouldEqual, expected)
 			})
 
 		})
-		Convey("when handling GET request on /tts/{ID}", func() {
+
+		Convey("when handling GET request on /voiceMessages/{ID}", func() {
 
 			Convey("should require ID value", func() {
-				req, err := http.NewRequest("GET", "/tts/", nil)
+				req, err := http.NewRequest("GET", rootUrl+"/", nil)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -256,7 +220,7 @@ func TestRestController(t *testing.T) {
 			})
 
 			Convey("should return result by ID", func() {
-				req, err := http.NewRequest("GET", "/tts/cafe", nil)
+				req, err := http.NewRequest("GET", rootUrl+"/cafe", nil)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -275,7 +239,7 @@ func TestRestController(t *testing.T) {
 			})
 
 			Convey("should return 404 for non-existing TTS", func() {
-				req, err := http.NewRequest("GET", "/tts/tea", nil)
+				req, err := http.NewRequest("GET", rootUrl+"/tea", nil)
 				if err != nil {
 					t.Fatal(err)
 				}
