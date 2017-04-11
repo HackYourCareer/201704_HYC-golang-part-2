@@ -16,11 +16,12 @@ func TestRestController(t *testing.T) {
 	Convey("Rest Controller", t, func(c C) {
 
 		const selfUrl = "http://localhost:3000"
+		const rootUrl = "/voiceMessages"
 
 		Convey("when handling GET request on /tts", func() {
 
 			Convey("should respond with 405 (Method Not Allowed) status code", func() {
-				req, err := http.NewRequest("GET", "/tts", nil)
+				req, err := http.NewRequest("GET", rootUrl, nil)
 
 				if err != nil {
 					t.Fatal(err)
@@ -42,7 +43,7 @@ func TestRestController(t *testing.T) {
 		Convey("when handling POST request on /tts", func() {
 
 			Convey("should validate request Content-Type", func() {
-				req, err := http.NewRequest("POST", "/tts", nil)
+				req, err := http.NewRequest("POST", rootUrl, nil)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -59,7 +60,7 @@ func TestRestController(t *testing.T) {
 			})
 
 			Convey("should validate missing body", func() {
-				req, err := http.NewRequest("POST", "/tts", nil)
+				req, err := http.NewRequest("POST", rootUrl, nil)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -77,7 +78,7 @@ func TestRestController(t *testing.T) {
 			})
 
 			Convey("should validate empty body", func() {
-				req, err := http.NewRequest("POST", "/tts", strings.NewReader(" "))
+				req, err := http.NewRequest("POST", rootUrl, strings.NewReader(" "))
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -102,7 +103,7 @@ func TestRestController(t *testing.T) {
 				json.NewEncoder(b).Encode(u)
 
 				//Prepare request
-				req, err := http.NewRequest("POST", "/tts", b)
+				req, err := http.NewRequest("POST", rootUrl, b)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -129,7 +130,7 @@ func TestRestController(t *testing.T) {
 				json.NewEncoder(b).Encode(u)
 
 				//Prepare request
-				req, err := http.NewRequest("POST", "/tts", b)
+				req, err := http.NewRequest("POST", rootUrl, b)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -156,7 +157,7 @@ func TestRestController(t *testing.T) {
 				json.NewEncoder(b).Encode(u)
 
 				//Prepare request
-				req, err := http.NewRequest("POST", "/tts", b)
+				req, err := http.NewRequest("POST", rootUrl, b)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -183,7 +184,7 @@ func TestRestController(t *testing.T) {
 				json.NewEncoder(b).Encode(u)
 
 				//Prepare request
-				req, err := http.NewRequest("POST", "/tts", b)
+				req, err := http.NewRequest("POST", rootUrl, b)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -212,7 +213,7 @@ func TestRestController(t *testing.T) {
 				json.NewEncoder(b).Encode(u)
 
 				//Prepare request
-				req, err := http.NewRequest("POST", "/tts", b)
+				req, err := http.NewRequest("POST", rootUrl, b)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -234,10 +235,10 @@ func TestRestController(t *testing.T) {
 			})
 
 		})
-		Convey("when handling GET request on /tts/{ID}", func() {
+		Convey("when handling GET request on /voiceMessages/{ID}", func() {
 
 			Convey("should require ID value", func() {
-				req, err := http.NewRequest("GET", "/tts/", nil)
+				req, err := http.NewRequest("GET", rootUrl+"/", nil)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -256,7 +257,7 @@ func TestRestController(t *testing.T) {
 			})
 
 			Convey("should return result by ID", func() {
-				req, err := http.NewRequest("GET", "/tts/cafe", nil)
+				req, err := http.NewRequest("GET", rootUrl+"/cafe", nil)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -275,7 +276,7 @@ func TestRestController(t *testing.T) {
 			})
 
 			Convey("should return 404 for non-existing TTS", func() {
-				req, err := http.NewRequest("GET", "/tts/tea", nil)
+				req, err := http.NewRequest("GET", rootUrl+"/tea", nil)
 				if err != nil {
 					t.Fatal(err)
 				}

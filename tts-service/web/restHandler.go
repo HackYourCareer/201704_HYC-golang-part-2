@@ -13,8 +13,8 @@ import (
 //We pass ServeMux explicitly to be able to unit-test in isolation.
 func New(mux *http.ServeMux, ttsService service.TtsService, engine *tts.Engine, selfUrl string) {
 
-	const createPathPrefix = "/tts"
-	const getPathPrefix = "/tts/"
+	const createPathPrefix = "/voiceMessages"
+	const getPathPrefix = "/voiceMessages/"
 	const mediaPathPrefix = "/media/"
 
 	//Allows to construct URL to media given it's ID
