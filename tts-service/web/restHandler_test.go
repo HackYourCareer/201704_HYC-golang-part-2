@@ -95,33 +95,6 @@ func TestRestController(t *testing.T) {
 				So(rr.Code, ShouldEqual, http.StatusBadRequest)
 			})
 
-			Convey("should correctly handle proper json body", func() {
-
-				//Encode JSON
-				u := CreateDTO{Text: "abcdef", Language: "EN"}
-				b := new(bytes.Buffer)
-				json.NewEncoder(b).Encode(u)
-
-				//Prepare request
-				req, err := http.NewRequest("POST", rootUrl, b)
-				if err != nil {
-					t.Fatal(err)
-				}
-				req.Header.Set("Content-Type", "application/json")
-
-				mux := http.NewServeMux()
-				New(mux, defaultMockService(), nil, selfUrl)
-
-				//Test the request
-				rr := httptest.NewRecorder()
-
-				mux.ServeHTTP(rr, req)
-
-				So(rr.Code, ShouldEqual, http.StatusAccepted)
-				const expected = `{"id":"abc123","text":"Received: abcdef","language":"EN","status":"PENDING"}` + "\n"
-				So(string(rr.Body.String()), ShouldEqual, expected)
-			})
-
 			Convey("should validate language", func() {
 
 				//Encode JSON
@@ -205,6 +178,33 @@ func TestRestController(t *testing.T) {
 				So(string(rr.Body.String()), ShouldEqual, expected)
 			})
 
+			Convey("should correctly handle proper json body", func() {
+
+				//Encode JSON
+				u := CreateDTO{Text: "abcdef", Language: "EN"}
+				b := new(bytes.Buffer)
+				json.NewEncoder(b).Encode(u)
+
+				//Prepare request
+				req, err := http.NewRequest("POST", rootUrl, b)
+				if err != nil {
+					t.Fatal(err)
+				}
+				req.Header.Set("Content-Type", "application/json")
+
+				mux := http.NewServeMux()
+				New(mux, defaultMockService(), nil, selfUrl)
+
+				//Test the request
+				rr := httptest.NewRecorder()
+
+				mux.ServeHTTP(rr, req)
+
+				So(rr.Code, ShouldEqual, http.StatusAccepted)
+				const expected = `{"id":"abc123","text":"Received: abcdef","language":"EN","status":"PENDING"}` + "\n"
+				So(string(rr.Body.String()), ShouldEqual, expected)
+			})
+
 			Convey("should correctly return json with MediaUrl and correct Content-Type", func() {
 
 				//Encode JSON
@@ -235,6 +235,7 @@ func TestRestController(t *testing.T) {
 			})
 
 		})
+
 		Convey("when handling GET request on /voiceMessages/{ID}", func() {
 
 			Convey("should require ID value", func() {
