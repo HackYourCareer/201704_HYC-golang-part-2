@@ -25,11 +25,11 @@ func onCreateRequest(h createHandling, w http.ResponseWriter, r *http.Request) {
 	//Invoke service
 	result, serviceErr := h.service.Create(ttsCreate)
 	if serviceErr != nil {
-		message := ErrorDTO{500, serviceErr.Error(), nil}
+		message := ErrorDTO{http.StatusInternalServerError, serviceErr.Error(), nil}
 		handleError(message, w, r)
 	} else {
 		addJsonHeader(w)
-		w.WriteHeader(201)
+		w.WriteHeader(http.StatusAccepted)
 		json.NewEncoder(w).Encode(toResultDTO(result, h.mediaUrl))
 	}
 
@@ -41,18 +41,18 @@ func readCreateDTO(r *http.Request) (*CreateDTO, error) {
 	contentType := r.Header.Get("Content-Type")
 
 	if !strings.HasPrefix(contentType, "application/json") {
-		return nil, ErrorDTO{415, "Invalid Content Type. Only application/json is supported", nil}
+		return nil, ErrorDTO{http.StatusUnsupportedMediaType, errInvalidContentType, nil}
 	}
 
 	if r.Body == nil {
-		err := ErrorDTO{400, "Request body must not be empty", nil}
+		err := ErrorDTO{400, errEmptyBody, nil}
 		return nil, err
 	} else {
 		err := json.NewDecoder(r.Body).Decode(&createDTO)
 		if err == nil {
 			return &createDTO, nil
 		} else {
-			return nil, ErrorDTO{400, "Can't read json data: " + err.Error(), nil}
+			return nil, ErrorDTO{http.StatusBadRequest, errJsonParse + err.Error(), nil}
 		}
 	}
 }
@@ -61,7 +61,7 @@ func validateCreateDTO(dto *CreateDTO) (*service.TtsCreate, error) {
 	var details []string
 
 	if dto.Text == "" {
-		details = append(details, "Text is empty")
+		details = append(details, errEmptyText)
 	}
 
 	var langEnum service.LangEnum = nil
@@ -72,12 +72,19 @@ func validateCreateDTO(dto *CreateDTO) (*service.TtsCreate, error) {
 	case "PL":
 		langEnum = service.PL
 	default:
-		details = append(details, "Unsupported Language: "+dto.Language)
+		details = append(details, errUnsupportedLang+dto.Language)
 	}
 
 	if len(details) == 0 {
 		return &service.TtsCreate{dto.Text, langEnum}, nil
 	} else {
-		return nil, ErrorDTO{400, "Invalid payload", details}
+		return nil, ErrorDTO{http.StatusBadRequest, errInvalidPayload, details}
 	}
 }
+
+const errInvalidContentType = "Invalid Content-Type. Only application/json is supported"
+const errEmptyBody = "Request body must not be empty"
+const errJsonParse = "Can't read json data: "
+const errEmptyText = "Text is empty"
+const errUnsupportedLang = "Unsupported Language: "
+const errInvalidPayload = "Invalid payload"

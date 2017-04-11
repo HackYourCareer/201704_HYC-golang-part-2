@@ -117,7 +117,7 @@ func TestRestController(t *testing.T) {
 
 				mux.ServeHTTP(rr, req)
 
-				So(rr.Code, ShouldEqual, http.StatusCreated)
+				So(rr.Code, ShouldEqual, http.StatusAccepted)
 				const expected = `{"id":"abc123","text":"Received: abcdef","language":"EN","status":"PENDING"}` + "\n"
 				So(string(rr.Body.String()), ShouldEqual, expected)
 			})
@@ -227,7 +227,7 @@ func TestRestController(t *testing.T) {
 
 				mux.ServeHTTP(rr, req)
 
-				So(rr.Code, ShouldEqual, http.StatusCreated)
+				So(rr.Code, ShouldEqual, http.StatusAccepted)
 				So(rr.Header().Get("Content-Type"), ShouldEqual, "application/json")
 
 				const expected = `{"id":"abc123","text":"Received: abcdef","language":"EN","status":"READY","mediaUrl":"` + selfUrl + `/media/123"}` + "\n"
