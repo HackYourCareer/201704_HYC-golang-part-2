@@ -12,14 +12,10 @@ import (
 )
 
 func main() {
-
-	const port = 8080
-
 	portStr := strconv.Itoa(port)
 
 	engine := tts.NewEngine()
 	persistence := service.NewPersistence()
-
 	controller := service.New(persistence, engine)
 
 	web.New(http.DefaultServeMux, controller, engine, selfUrl(portStr))
@@ -36,3 +32,5 @@ func selfUrl(port string) string {
 	}
 	return selfUrl
 }
+
+const port = 8080

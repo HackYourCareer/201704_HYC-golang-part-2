@@ -3,10 +3,10 @@ package service
 import (
 	"crypto/sha1"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"github.com/SAPHybrisGliwice/golang-part-2/tts-service/tts"
 	"strings"
-	"errors"
 )
 
 //Public API
