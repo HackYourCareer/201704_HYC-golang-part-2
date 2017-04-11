@@ -20,8 +20,8 @@ func TestRestController(t *testing.T) {
 
 		Convey("when handling GET request on /tts", func() {
 
-			SkipConvey("should respond with 405 (Method Not Allowed) status code", func() {
-
+			Convey("should respond with 405 (Method Not Allowed) status code", func() {
+				t.Fail()
 			})
 		})
 
@@ -80,8 +80,8 @@ func TestRestController(t *testing.T) {
 				So(rr.Code, ShouldEqual, http.StatusBadRequest)
 			})
 
-			SkipConvey("should validate language", func() {
-
+			Convey("should validate language", func() {
+				t.Fail()
 			})
 
 			Convey("should require Text", func() {
