@@ -15,7 +15,7 @@ func TestEngine(t *testing.T) {
 
 		Convey("should return an ID in case of a success", func() {
 
-			//TODO
+			t.Fail()
 		})
 	})
 }
@@ -23,11 +23,11 @@ func TestEngine(t *testing.T) {
 const converterErrorMessage = "Converter. Unexpected error."
 const storageErrorMessage = "Storage. Unexpected error."
 
-type mockConverter struct {
+type dummyConverter struct {
 	failing bool
 }
 
-func (mc mockConverter) Convert(text string, metadata Metadata) (io.ReadCloser, error) {
+func (mc dummyConverter) Convert(text string, metadata Metadata) (io.ReadCloser, error) {
 
 	if mc.failing {
 
@@ -37,11 +37,11 @@ func (mc mockConverter) Convert(text string, metadata Metadata) (io.ReadCloser, 
 	return ioutil.NopCloser(strings.NewReader("test")), nil
 }
 
-type mockStorage struct {
+type dummyStorage struct {
 	failing bool
 }
 
-func (ms mockStorage) Save(data io.Reader) (string, error) {
+func (ms dummyStorage) Save(data io.Reader) (string, error) {
 
 	if ms.failing {
 
@@ -51,7 +51,7 @@ func (ms mockStorage) Save(data io.Reader) (string, error) {
 	return "dummyID", nil
 }
 
-func (ms mockStorage) Get(id string) (io.ReadCloser, error) {
+func (ms dummyStorage) Get(id string) (io.ReadCloser, error) {
 
 	if ms.failing {
 
@@ -61,7 +61,7 @@ func (ms mockStorage) Get(id string) (io.ReadCloser, error) {
 	return ioutil.NopCloser(strings.NewReader("test")), nil
 }
 
-func (ms mockStorage) Delete(id string) error {
+func (ms dummyStorage) Delete(id string) error {
 
 	return nil
 }
