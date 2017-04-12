@@ -6,7 +6,6 @@ import (
 
 	"github.com/SAPHybrisGliwice/golang-part-2/tts-service/service"
 	"github.com/SAPHybrisGliwice/golang-part-2/tts-service/tts"
-	"log"
 	"strings"
 )
 
@@ -33,7 +32,6 @@ func New(mux *http.ServeMux, ttsService service.TtsService, engine *tts.Engine, 
 
 	//Handle simple UI
 	mux.HandleFunc("/public/", uiHandler)
-	log.Printf("Installed web handlers.")
 }
 
 type mediaUrlFunc func(string) string
