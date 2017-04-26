@@ -5,8 +5,9 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"github.com/SAPHybrisGliwice/golang-part-2/tts-service/tts"
 	"strings"
+
+	"github.com/SAPHybrisGliwice/golang-part-2/tts-service/tts"
 )
 
 //Public API
@@ -14,11 +15,13 @@ import (
 type TtsService interface {
 	Create(create *TtsCreate) (*TtsResult, error)
 	Get(ID string) (*TtsResult, error)
+	Delete(ID string) error
 }
 
 //Interface abstracting over tts.Engine
 type MediaEngine interface {
 	Process(text string, meta tts.Metadata) (string, error)
+	Delete(id string) error
 }
 
 func New(persistence TtsPersistence, engine MediaEngine) TtsService {
@@ -93,6 +96,30 @@ func (srv impl) Get(id string) (*TtsResult, error) {
 		Status:   status(data.Status),
 		MediaId:  data.MediaId,
 	}, nil
+}
+
+func (srv impl) Delete(id string) error {
+
+	// Get tts media id
+	ttsResult, getErr := srv.Get(id)
+	if getErr != nil {
+		return getErr
+	}
+	mediaId := ttsResult.MediaId
+
+	// Remove metadata from persistance
+	persistanceErr := srv.persistence.del(id)
+	if persistanceErr != nil {
+		return persistanceErr
+	}
+
+	// Remove media from storage
+	storageErr := srv.ttsEngine.Delete(mediaId)
+	if storageErr != nil {
+		return storageErr
+	}
+
+	return nil
 }
 
 func (srv impl) generateMedia(id, text string, language LangEnum) {

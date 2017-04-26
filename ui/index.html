@@ -14,6 +14,15 @@
                     'success': callback
                 });
             };
+
+            $.deleteJSON = (url, id, successCb, errorCb) => {
+                return jQuery.ajax({
+                    'type': 'DELETE',
+                    'url': url + id,
+                    'success': successCb,
+                    'error': errorCb
+                });
+            };
         </script>
 
         <script>
@@ -50,6 +59,30 @@
                     $.postJSON("http://localhost:8080/voiceMessages", data, successHandler);
                 });
 
+                $("#deleteMedia").click( () => {
+                    let mediaId = $("#mediaId").val();
+
+                    let successHandler = (data, textStatus, jqXHR) => {
+                        let msg = $("#removalSuccessful");
+                        msg.fadeIn();
+                        setTimeout(() => {
+                            msg.fadeOut();
+                        }, 3500);
+                    }
+
+                    let errorHandler = (jqXHR, textStatus, errorThrown) => {
+                        if (errorThrown !== "Not Found") return;
+
+                        let msg = $("#removalError");
+                        msg.fadeIn();
+                        setTimeout(() => {
+                            msg.fadeOut();
+                        }, 3500);
+                    }
+
+                    $.deleteJSON("http://localhost:8080/voiceMessages/", mediaId, successHandler, errorHandler);
+                })
+
             });
         </script>
     </head>
@@ -81,5 +114,22 @@
             </div>
         </div>
         <audio id="audio" src=""></audio>
+        <br/><br/>
+        <div>
+            <div>Delete stored media:</div>
+            <div>
+                <label for="mediaId">ID:</label>
+                <input type="text" id="mediaId" value="" size="80" style="size: 20px"/>
+            </div>
+            <div> 
+                <button id="deleteMedia">Send removal request!</button>
+            </div>
+            <div id="removalSuccessful" style="display: none; padding: 15px">
+                <span style="color:darkgreen; font-size:2em">Media succesfully removed!</span>
+            </div>
+            <div id="removalError" style="display: none; padding: 15px">
+                <span style="color:red; font-size:2em">Media not found!</span>
+            </div>
+        </div>
     </body>
 </html>

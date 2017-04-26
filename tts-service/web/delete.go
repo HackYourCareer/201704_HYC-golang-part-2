@@ -1,11 +1,10 @@
 package web
 
 import (
-	"encoding/json"
 	"net/http"
 )
 
-func onGetByIdRequest(h getOrDeleteHandling, w http.ResponseWriter, r *http.Request) {
+func onDeleteByIdRequest(h getOrDeleteHandling, w http.ResponseWriter, r *http.Request) {
 
 	//Invoke service
 	id, err := getId(h.pathPrefix, r)
@@ -14,13 +13,12 @@ func onGetByIdRequest(h getOrDeleteHandling, w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	result, serviceErr := h.service.Get(id)
+	serviceErr := h.service.Delete(id)
 
 	if serviceErr != nil {
 		handleError(convertError(serviceErr), w, r)
 	} else {
 		addJsonHeader(w)
-		w.WriteHeader(200)
-		json.NewEncoder(w).Encode(toResultDTO(result, h.mediaUrl))
+		w.WriteHeader(http.StatusNoContent) // action enacted, response does not include an entity
 	}
 }

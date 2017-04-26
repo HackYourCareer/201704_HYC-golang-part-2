@@ -4,16 +4,17 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"strings"
+
 	"github.com/SAPHybrisGliwice/golang-part-2/tts-service/service"
 	"github.com/SAPHybrisGliwice/golang-part-2/tts-service/tts"
-	"strings"
 )
 
 //We pass ServeMux explicitly to be able to unit-test in isolation.
 func New(mux *http.ServeMux, ttsService service.TtsService, engine *tts.Engine, selfUrl string) {
 
 	const createPathPrefix = "/voiceMessages"
-	const getPathPrefix = "/voiceMessages/"
+	const getOrDeletePathPrefix = "/voiceMessages/"
 	const mediaPathPrefix = "/media/"
 
 	//Allows to construct URL to media given it's ID
@@ -22,12 +23,12 @@ func New(mux *http.ServeMux, ttsService service.TtsService, engine *tts.Engine, 
 	}
 
 	create := createHandling{createPathPrefix, ttsService, mediaUrl}
-	get := getHandling{getPathPrefix, ttsService, mediaUrl}
+	getOrDelete := getOrDeleteHandling{getOrDeletePathPrefix, ttsService, mediaUrl}
 	media := mediaHandling{mediaPathPrefix, engine}
 
 	//Second argument must be a http.HandlerFunc Function!
 	mux.HandleFunc(create.pathPrefix, create.handle)
-	mux.HandleFunc(get.pathPrefix, get.handle)
+	mux.HandleFunc(getOrDelete.pathPrefix, getOrDelete.handle)
 	mux.HandleFunc(media.pathPrefix, media.handle)
 
 	//Handle simple UI
@@ -53,20 +54,22 @@ func (h createHandling) handle(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// GET HANDLING
-type getHandling struct {
+// GET OR DELETE HANDLING
+type getOrDeleteHandling struct {
 	pathPrefix string
 	service    service.TtsService
 	mediaUrl   mediaUrlFunc
 }
 
-func (h getHandling) handle(w http.ResponseWriter, r *http.Request) {
+func (h getOrDeleteHandling) handle(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
 		onGetByIdRequest(h, w, r)
+	case "DELETE":
+		onDeleteByIdRequest(h, w, r)
 	default:
-		onMethodNotSupported([]string{"GET"}, w, r)
+		onMethodNotSupported([]string{"GET", "DELETE"}, w, r)
 	}
 }
 

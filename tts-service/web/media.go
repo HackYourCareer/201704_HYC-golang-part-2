@@ -22,4 +22,5 @@ func onGetMediaRequest(h mediaHandling, w http.ResponseWriter, r *http.Request) 
 	}
 
 	io.Copy(w, reader)
+	reader.Close() // media file has to be closed so it can be deleted on windows
 }

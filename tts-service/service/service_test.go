@@ -189,6 +189,85 @@ func TestService(t *testing.T) {
 			So(actions[0], ShouldEqual, "persistence.create")
 			So(actions[1], ShouldEqual, "persistence.get")
 		})
+
+		Convey("Delete by Id should return an error if media file not exists", func() {
+			actions := []string{}
+
+			//given
+			mock := mock("abc", ttsData{"Hello,World", "EN", StatusPending.String(), "media"})
+			s := New(mock, mock)
+
+			//when
+			err := s.Delete("abc")
+
+			//then
+			So(err, ShouldNotBeNil)
+			notFound, ok := err.(ObjectNotFoundError)
+
+			So(ok, ShouldBeTrue)
+			So(notFound.Message, ShouldEqual, "TTS with ID: 'media' doesn't exist")
+
+			//Ensure all operations in the backgrounds completed...
+			actions = readBlocking(actions, mock.recordChan)
+			actions = readBlocking(actions, mock.recordChan)
+
+			//Verify interaction
+			So(actions[0], ShouldEqual, "persistence.get")
+			So(actions[1], ShouldEqual, "tts.Engine.Delete")
+
+		})
+
+		Convey("Delete by Id should return an error if media metadata not exists", func() {
+			actions := []string{}
+
+			//given
+			mock := mock("abc", ttsData{"Hello,World", "EN", StatusPending.String(), "media"})
+			s := New(mock, mock)
+
+			//when
+			err := s.Delete("nope")
+
+			//then
+			So(err, ShouldNotBeNil)
+			notFound, ok := err.(ObjectNotFoundError)
+
+			So(ok, ShouldBeTrue)
+			So(notFound.Message, ShouldEqual, "TTS with ID: 'nope' doesn't exist")
+
+			//Ensure all operations in the backgrounds completed...
+			actions = readBlocking(actions, mock.recordChan)
+
+			//Verify interaction
+			So(actions[0], ShouldEqual, "persistence.get")
+
+		})
+
+		Convey("Delete by Id should return no error if both metadata and media file exist", func() {
+			actions := []string{}
+
+			//given
+			mock := mock("abc", ttsData{"Hello,World", "EN", StatusPending.String(), "media"})
+			mock.mediaIdThatExists = "media"
+			s := New(mock, mock)
+
+			//when
+			err := s.Delete("abc")
+
+			//then
+			So(err, ShouldBeNil)
+			notFound, ok := err.(ObjectNotFoundError)
+
+			So(ok, ShouldBeFalse)
+			So(notFound.Message, ShouldBeBlank)
+
+			//Ensure all operations in the backgrounds completed...
+			actions = readBlocking(actions, mock.recordChan)
+			actions = readBlocking(actions, mock.recordChan)
+
+			//Verify interaction
+			So(actions[0], ShouldEqual, "persistence.get")
+			So(actions[1], ShouldEqual, "tts.Engine.Delete")
+		})
 	})
 }
 
@@ -210,6 +289,7 @@ type interactionMock struct {
 	mediaIdToGenerate    string //if empty, return error from tts.Engine.Process
 	ttsTextThatFails     string //if invoked with this text, simulate persistence failure
 	ttsTextThatConflicts string //if invoked with this text, return ObjectAlreadyExistsError
+	mediaIdThatExists    string //if invoked with this id, return no error for deletion
 
 	recordChan chan string
 }
@@ -269,6 +349,16 @@ func (mp *interactionMock) Process(text string, meta tts.Metadata) (string, erro
 		return "", errors.New("Network Unreachable")
 	}
 	return mp.mediaIdToGenerate, nil
+}
+
+//Implements MediaEngine interface
+func (mp *interactionMock) Delete(id string) error {
+	mp.recordChan <- "tts.Engine.Delete"
+
+	if id == mp.mediaIdThatExists {
+		return nil
+	}
+	return NotFound(id)
 }
 
 func readBlocking(source []string, recordChan chan string) []string {
