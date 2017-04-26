@@ -150,7 +150,11 @@ func (fb fileBased) update(id string, status string, mediaId string) error {
 }
 
 func (fb fileBased) del(id string) error {
-	return os.Remove(fb.pathWithId(id))
+	err := os.Remove(fb.pathWithId(id))
+	if os.IsNotExist(err) {
+		err = NotFound(id)
+	}
+	return err
 }
 
 func (fb fileBased) pathWithId(name string) string {

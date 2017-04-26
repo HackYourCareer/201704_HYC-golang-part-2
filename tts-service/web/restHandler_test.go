@@ -296,6 +296,67 @@ func TestRestController(t *testing.T) {
 			})
 
 		})
+
+		Convey("when handling DELETE request on /voiceMessages/{ID}", func() {
+
+			Convey("should require ID value", func() {
+				req, err := http.NewRequest("DELETE", rootUrl+"/", nil)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				mux := http.NewServeMux()
+				New(mux, defaultMockService(), nil, selfUrl)
+
+				//Test the request
+				rr := httptest.NewRecorder()
+
+				mux.ServeHTTP(rr, req)
+
+				So(rr.Code, ShouldEqual, http.StatusBadRequest)
+				const expected = `{"status":400,"message":"Missing ID in request path"}` + "\n"
+				So(string(rr.Body.String()), ShouldEqual, expected)
+			})
+
+			Convey("should return 402 after enacting deletion", func() {
+				req, err := http.NewRequest("DELETE", rootUrl+"/cafe", nil)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				mux := http.NewServeMux()
+				New(mux, defaultMockService(), nil, selfUrl)
+
+				//Test the request
+				rr := httptest.NewRecorder()
+
+				mux.ServeHTTP(rr, req)
+
+				So(rr.Code, ShouldEqual, http.StatusNoContent)
+				const expected = ``
+				So(string(rr.Body.String()), ShouldEqual, expected)
+			})
+
+			Convey("should return 404 for non-existing TTS", func() {
+				req, err := http.NewRequest("DELETE", rootUrl+"/tea", nil)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				mux := http.NewServeMux()
+				New(mux, defaultMockService(), nil, selfUrl)
+
+				//Test the request
+				rr := httptest.NewRecorder()
+
+				mux.ServeHTTP(rr, req)
+
+				So(rr.Code, ShouldEqual, http.StatusNotFound)
+				const expected = `{"status":404,"message":"TTS with ID: 'tea' doesn't exist"}` + "\n"
+				So(string(rr.Body.String()), ShouldEqual, expected)
+			})
+
+		})
 	})
 }
 
@@ -336,5 +397,14 @@ func (s mockService) Get(id string) (*service.TtsResult, error) {
 		return &res, nil
 	} else {
 		return nil, service.NotFound(id)
+	}
+}
+
+func (s mockService) Delete(id string) error {
+
+	if id == "cafe" {
+		return nil
+	} else {
+		return service.NotFound(id)
 	}
 }

@@ -18,7 +18,7 @@ func (e Engine) Process(text string, meta Metadata) (string, error) {
 		return "", err
 	}
 
-        defer r.Close()
+	defer r.Close()
 
 	id, err := e.str.Save(r)
 	if err != nil {
@@ -26,6 +26,11 @@ func (e Engine) Process(text string, meta Metadata) (string, error) {
 	}
 
 	return id, nil
+}
+
+// Delete removes audio media from storage.
+func (e Engine) Delete(id string) error {
+	return e.str.Delete(id)
 }
 
 // Result returns the processing result based on its ID.
